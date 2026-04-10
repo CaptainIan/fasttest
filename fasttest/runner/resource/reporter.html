@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Reporter</title>
+    <style>
+        body {
+            font-family: "ProximaNova-Light", "Avenir Next", "-apple-system-body", "Helvetica Neue", "Helvetica", sans-serif;
+            margin: 0; 
+            padding: 0;
+        }
+
+        p {
+            line-height: 1.6;
+            color: #333333;
+            letter-spacing: 0.5px;    
+        }
+
+        .color-default {
+            color: #8A8A8A;
+        }
+
+        .color-success {
+            color: #AFD979;
+        }
+
+        .color-errors {
+            color: #CE606B;
+        }
+
+        .color-failures {
+            color: #E3A032;
+        }
+
+        .color-total {
+            color: #7FB794;
+        }
+
+        .reporter-header {
+            width: 100%;
+            height: 90px;
+            align-items: center;
+            display: flex;
+            border-collapse: collapse;
+            box-shadow: 0px 0px 6px #8A8A8A; /* 添加底部阴影 */
+            margin-bottom: 20px;
+        }
+
+        .reporter-header p {
+            font-size: 22px;
+        }
+
+        .reporter-header-logo {
+            flex: 3.5;
+            display: flex;
+            align-items: center;
+        }
+
+        .reporter-header-logo svg {
+            width: 48px; 
+            height: auto;
+            margin-right: 15px;
+            margin-left: 20%;
+        }
+
+        
+        .reporter-summary {
+            flex: 6.5;
+            justify-content: space-between; 
+            display: flex;
+            margin-right: 5%;
+        }
+
+        .summary-block {
+            display: flex;
+            flex-direction: column; /* 设置子元素竖直排列 */
+            align-items: center; /* 子元素水平居中对齐 */
+        }
+
+        .summary-block p:nth-child(1) {
+            margin: 2px; /* 根据需要调整间距 */
+            font-size: 16px;
+            color: #333333;
+        }
+
+        .summary-block p:nth-child(2) {
+            margin: 3px; 
+            font-size: 24px;
+            font-weight: bold; /* 加粗文字 */
+        }
+
+
+
+
+        .reporter-table {
+            width: 100%;
+            height: 100%;
+            padding-left: 3%; 
+            padding-right: 3%; 
+
+        }
+
+        .reporter-table th {
+            font-weight: normal;
+            background-color: #f5f5f5;
+        }
+
+        .table-th {
+            padding-left: 3%; 
+            padding-right: 3%; 
+            width: 94%;
+            display: flex;
+        }
+
+        .table-th p:nth-child(1) {
+            font-size: 18px;
+            font-weight: bold; /* 加粗文字 */
+        }
+
+        .table-th-block {
+            display: flex;
+            flex: calc(9.2 / 7);
+            align-items: center; /* 垂直居中对齐子元素 */
+            gap: 5px; /* 设置子元素之间的间距 */
+        }
+
+
+        .table-cell {
+            padding-left: 5%; 
+            padding-right: 5%; 
+            width: 90%;
+            display: flex;
+        }
+
+
+        .table-cell td {
+            border-bottom: 1px solid #f1f1f1;
+            display: flex; 
+        }
+
+
+        .table-cell td:nth-child(1) {
+            flex: 0.5;
+            padding-left: 10px; 
+        }
+
+        .table-cell td:nth-child(2) {
+            flex: 6.5;
+        }
+
+        .table-cell td:nth-child(3) {
+            flex: 1;
+        }
+
+        .table-cell td:nth-child(4) {
+            flex: 1;
+        }
+
+        .table-cell-case {
+            display: flex; 
+            align-items: center; /* 垂直居中对齐子元素 */
+        }
+
+        .table-cell-details {
+            display: flex; 
+            padding-left: 7%; 
+            padding-right: 7%; 
+            width: 86%;
+        }
+
+        .table-cell-details td {
+            display: flex; 
+        }
+
+        .details-container {
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+            width: 100%; /* 设置容器宽度为100% */
+        }
+
+        .details-multimedia {
+            display: flex;  
+        }
+
+        .multimedia-module {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .multimedia-module video, img {
+            max-height: 500px;
+            object-fit: contain; /* 保持内容比例，完整显示 */
+        }
+
+        .text-content {
+            flex: 2;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .text-content pre {
+            line-height: 1.6;
+            color: #333333;
+            letter-spacing: 0.5px;  
+            white-space: pre-wrap; /* 保留空白符和自动换行 */
+            word-wrap: break-word; /* 长单词也会换行 */
+        }
+
+        .api-block {
+            margin-bottom: 16px;
+            border-left: 3px solid #7FB794;
+            padding-left: 12px;
+        }
+
+        .api-block .api-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin: 6px 0;
+        }
+
+        .api-block .api-label {
+            font-size: 12px;
+            color: #8A8A8A;
+            margin: 4px 0 2px 0;
+        }
+
+        .api-block pre {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0 0 6px 0;
+        }
+
+        .api-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .api-status-ok { background: #e8f5e9; color: #388e3c; }
+        .api-status-err { background: #fce4e4; color: #c62828; }
+
+    </style>
+</head>
+<body>
+<div class="reporter-header">
+    <div class="reporter-header-logo">
+        <svg t="1728375477122" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10758" width="256" height="256"><path d="M629.0944 406.3744c-14.7456 13.7216-37.3248 14.1312-53.76 2.048L423.7312 297.0624 226.5088 450.304a43.4176 43.4176 0 0 1-63.0784-6.8608c-15.4624-17.7152-12.3392-45.312 7.0144-60.5696L394.752 207.1552a45.6704 45.6704 0 0 1 54.9888-0.8192l151.7056 111.3088 197.12-154.4192c19.4048-15.1552 47.616-12.0832 61.8496 6.8608 16.6912 18.944 13.6192 46.592-7.0144 61.7472l-224.3072 174.5408z m-225.6896 127.744c0-27.7504 18.0224-50.176 40.2432-50.176 22.272 0 40.2432 22.4256 40.2432 50.176v300.9536c0 27.7504-17.9712 50.176-40.2432 50.176-22.2208 0-40.2432-22.4256-40.2432-50.176v-300.9536z m-198.144 150.528c0-27.8016 17.92-50.176 40.192-50.176 22.2208 0 40.192 22.3744 40.192 50.176v150.4256c0 27.7504-17.9712 50.176-40.192 50.176-22.2208 0-40.2432-22.4256-40.2432-50.176V684.544z m476.8256-50.176v200.6016c0 27.7504-17.92 50.176-40.192 50.176-22.272 0-40.2432-22.4256-40.2432-50.176V634.368c0-27.6992 17.9712-50.176 40.2432-50.176 22.2208 0 40.192 22.4768 40.192 50.176z m117.76-100.352c0-27.7504 17.9712-50.176 40.2432-50.176 22.272 0 40.2432 22.4256 40.2432 50.176v300.9536c0 27.7504-17.9712 50.176-40.2432 50.176-22.272 0-40.2432-22.4256-40.2432-50.176v-300.9536z" p-id="10759" fill="#8A8A8A"></path></svg>
+        <p>Test Reporter</p>
+    </div>
+    <div class="reporter-summary">
+        <div class="summary-block">
+            <p>TOTAL</p>
+            <p class="color-total" >{{ summary.total }}</p>
+        </div>
+        <div class="summary-block">
+            <p>SUCCESS</p>
+            <p class="color-success">{{ summary.success }}</p>
+        </div>
+        <div class="summary-block">
+            <p>ERRORS</p>
+            <p class="color-errors">{{ summary.errors }}</p>
+        </div>
+        <div class="summary-block">
+            <p>FAILURES</p>
+            <p class="color-failures">{{ summary.failures }}</p>
+        </div>
+        <div class="summary-block">
+            <p>SKIPPED</p>
+            <p class="color-default">{{ summary.skipped }}</p>
+        </div>
+        <div class="summary-block">
+            <p>PASSRATE</p>
+            <p class="{{summary.passrate_color}}">{{ summary.passrate }}%</p>
+        </div>
+        <div class="summary-block">
+            <p>DURATION</p>
+            <p class="color-default" >{{ summary.duration }}s</p>
+        </div>
+    </div>
+</div>
+
+<table class="reporter-table ">
+    {% for item in testCases %}
+        <tr>
+            <th colspan="3">
+                <div>
+                    <div class="table-th">
+                        <p>{{ item.path }}</p>
+                    </div>
+                    <div class="table-th">
+                        <div class="table-th-block">
+                            <svg t="1725973158989" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="52516" id="mx_n_1725973158989" width="22" height="22"><path d="M512 972.982857A460.982857 460.982857 0 1 1 972.982857 512 461.531429 461.531429 0 0 1 512 972.982857z m0-867.108571A406.125714 406.125714 0 1 0 918.125714 512 406.491429 406.491429 0 0 0 512 105.874286z" fill="#7FB794" p-id="52517"></path><path d="M512 777.874286A265.874286 265.874286 0 1 1 777.874286 512 266.057143 266.057143 0 0 1 512 777.874286z m0-476.891429A211.017143 211.017143 0 1 0 723.017143 512 211.382857 211.382857 0 0 0 512 300.982857z" fill="#7FB794" p-id="52518"></path><path d="M264.411429 154.697143m-79.177143 0a79.177143 79.177143 0 1 0 158.354285 0 79.177143 79.177143 0 1 0-158.354285 0Z" fill="#7FB794" p-id="52519"></path><path d="M755.017143 867.84m-79.177143 0a79.177143 79.177143 0 1 0 158.354286 0 79.177143 79.177143 0 1 0-158.354286 0Z" fill="#7FB794" p-id="52520"></path></svg>
+                            <p> Total:</p>
+                            <p>{{item.total}}</p>
+                        </div>
+                        <div class="table-th-block">
+                            <svg t="1725971270943" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="44144" width="22" height="22"><path d="M512 960A448.11 448.11 0 0 1 337.61 99.22a448.11 448.11 0 0 1 348.78 825.56A445.19 445.19 0 0 1 512 960z m0-832c-211.74 0-384 172.26-384 384s172.26 384 384 384 384-172.26 384-384-172.26-384-384-384z" fill="#AFD979" p-id="44145"></path><path d="M446.06 720.79A64.16 64.16 0 0 1 400.79 702L265.37 566.63a32 32 0 0 1 45.26-45.26L446 656.79l249.62-293.52a32 32 0 0 1 48.76 41.46L494.84 698.19a64.1 64.1 0 0 1-46.14 22.54q-1.32 0.06-2.64 0.06z" fill="#AFD979" p-id="44146"></path></svg>
+                            <p>Success:</p>
+                            <p>{{item.success}}</p>
+                        </div>
+                        <div class="table-th-block">
+                            <svg t="1725971315140" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="44975" width="22" height="22"><path d="M512 960A448.11 448.11 0 0 1 337.61 99.22a448.11 448.11 0 0 1 348.78 825.56A445.19 445.19 0 0 1 512 960z m0-832c-211.74 0-384 172.26-384 384s172.26 384 384 384 384-172.26 384-384-172.26-384-384-384z" fill="#CE606B" p-id="44976"></path><path d="M352 704a32 32 0 0 1-22.63-54.63l320-320a32 32 0 0 1 45.26 45.26l-320 320A31.9 31.9 0 0 1 352 704z" fill="#CE606B" p-id="44977"></path><path d="M672 704a31.9 31.9 0 0 1-22.63-9.37l-320-320a32 32 0 0 1 45.26-45.26l320 320A32 32 0 0 1 672 704z" fill="#CE606B" p-id="44978"></path></svg>
+                            <p>Errors:</p>
+                            <p>{{item.errors}}</p>
+                        </div>
+                        <div class="table-th-block">
+                            <svg t="1725971304606" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="44767" width="22" height="22"><path d="M512 960A448.11 448.11 0 0 1 337.61 99.22a448.11 448.11 0 0 1 348.78 825.56A445.19 445.19 0 0 1 512 960z m0-832c-211.74 0-384 172.26-384 384s172.26 384 384 384 384-172.26 384-384-172.26-384-384-384z" fill="#E3A032" p-id="44768"></path><path d="M512 608a32 32 0 0 1-32-32V288a32 32 0 0 1 64 0v288a32 32 0 0 1-32 32z" fill="#E3A032" p-id="44769"></path><path d="M464 672m48 0l0 0q48 0 48 48l0 0q0 48-48 48l0 0q-48 0-48-48l0 0q0-48 48-48Z" fill="#E3A032" p-id="44770"></path></svg>
+                            <p>Failures:</p>
+                            <p>{{item.failures}}</p>
+                        </div>
+                        <div class="table-th-block">
+                            <svg t="1725971351500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="46009" width="22" height="22"><path d="M352 480h320c9.344 0 17.024 3.008 23.04 8.96 5.952 6.016 8.96 13.696 8.96 23.04a31.168 31.168 0 0 1-8.96 23.04 31.168 31.168 0 0 1-23.04 8.96h-320a31.168 31.168 0 0 1-23.04-8.96A31.168 31.168 0 0 1 320 512c0-9.344 3.008-17.024 8.96-23.04a31.168 31.168 0 0 1 23.04-8.96zM512 896c108.672-2.688 199.168-40.192 271.488-112.512S893.312 620.672 896 512c-2.688-108.672-40.192-199.168-112.512-271.488S620.672 130.688 512 128c-108.672 2.688-199.168 40.192-271.488 112.512S130.688 403.328 128 512c2.688 108.672 40.192 199.168 112.512 271.488S403.328 893.312 512 896z m0 64c-126.72-3.328-232.192-47.168-316.544-131.52C111.232 744.192 67.392 638.72 64 512c3.328-126.72 47.168-232.192 131.456-316.544C279.872 111.232 385.344 67.392 512 64c126.72 3.328 232.192 47.168 316.48 131.456C912.832 279.872 956.672 385.344 960 512c-3.328 126.72-47.168 232.192-131.52 316.48C744.192 912.832 638.72 956.672 512 960z" p-id="46010" fill="#8A8A8A"></path></svg>
+                            <p>Skipped:</p>
+                            <p>{{item.skipped}}</p>
+                        </div>
+                        <div class="table-th-block">
+                            <svg t="1725972938809" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="47241" width="22" height="22"><path d="M526.46 258.87c-1.87-14.94-14.62-26.5-30.07-26.5-16.74 0-30.31 13.57-30.31 30.31v247.44l0.38 4.77c1 6.27 3.95 12.11 8.5 16.66l144.72 144.72 3.4 2.93c11.86 8.8 28.7 7.82 39.46-2.93l2.93-3.4c8.8-11.86 7.82-28.7-2.93-39.46L526.68 497.53l0.02-234.86-0.24-3.8z" p-id="47242" fill="#8A8A8A"></path><path d="M511.33 63.11c-246.87 0-447 200.13-447 447s200.13 447 447 447c95.09 0 185.77-29.8 261.27-84.27 13.57-9.79 16.64-28.73 6.85-42.31-9.79-13.57-28.73-16.64-42.31-6.85-65.26 47.09-143.56 72.81-225.81 72.81-213.4 0-386.39-172.99-386.39-386.39s172.99-386.39 386.39-386.39S897.72 296.7 897.72 510.1c0 73.92-20.76 144.7-59.33 205.84-8.93 14.16-4.69 32.87 9.46 41.8 14.16 8.93 32.87 4.69 41.8-9.46 44.63-70.75 68.67-152.72 68.67-238.17 0.01-246.87-200.12-447-446.99-447z" p-id="47243" fill="#8A8A8A"></path></svg>
+                            <p>Duration:</p>
+                            <p>{{item.duration}}s</p>
+                        </div>
+                        <div class="table-th-block">
+                            <svg t="1725973014528" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="50828" width="22" height="22"><path d="M514.285568 524.435456h24.82176c124.870656 0 249.741312-0.028672 374.611968 0.02048 30.43328 0.008192 37.08928 7.000064 36.352 37.543936-5.496832 227.803136-182.935552 420.716544-410.525696 446.316544-248.819712 27.992064-474.697728-145.6128-510.287872-392.187904C-6.598656 367.726592 160.673792 136.626176 407.773184 93.855744c24.768512-4.288512 50.040832-6.148096 75.165696-7.737344 22.745088-1.441792 30.978048 6.643712 31.174656 29.970432 0.438272 52.535296 0.16384 105.078784 0.167936 157.618176 0.008192 82.5344 0.004096 165.056512 0.004096 250.728448z m386.494464 49.152h-23.646208c-124.207104 0-248.414208 0.008192-372.625408-0.012288-33.73056-0.004096-39.34208-5.50912-39.354368-39.079936-0.049152-124.891136-0.02048-249.782272-0.02048-374.673408v-23.90016c-158.564352-1.507328-375.599104 132.599808-393.535488 387.305472-16.326656 231.845888 169.803776 436.252672 400.764928 442.114048 247.816192 6.283264 421.289984-191.2832 428.417024-391.753728z" p-id="50829" fill="#AFD979"></path><path d="M565.379072 242.274304c-0.004096-63.471616-0.077824-126.939136 0.028672-190.410752 0.049152-27.951104 8.978432-36.212736 37.326848-35.168256 191.299584 7.032832 360.394752 154.607616 392.454144 343.359488 4.542464 26.771456 6.455296 54.10816 7.7824 81.268736 0.970752 19.791872-8.51968 29.179904-28.291072 29.229056-126.939136 0.290816-253.878272 0.311296-380.821504-0.032768-20.160512-0.053248-28.348416-9.854976-28.413952-31.694848-0.188416-65.51552-0.065536-131.03104-0.065536-196.550656z m50.130944 177.635328h343.810048c-5.881856-206.286848-185.081856-354.619392-343.810048-357.240832v357.240832z" p-id="50830" fill="#AFD979"></path></svg>
+                            <p>Passrate:</p>
+                            <p>{{item.passrate}}%</p>
+                        </div>
+                    </div>
+                </div>
+            </th>
+        </tr>
+        {% for case in item.cases %}
+            <tr class="table-cell" id="{{case.id}}" onclick="toggleDetails(this)">
+                <td>
+                    <div class="table-cell-case">
+                        <p id="btn-{{case.id}}">+</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-cell-case">
+                        {% if case.case_desc %}
+                            <p>{{case.case_desc}}</p>
+                        {% else %}
+                            <p>{{case.case_name}}</p>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="table-cell-case">
+                        <p>{{case.duration}}s</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-cell-case">
+                        {% if case.status == 0 %}
+                            <svg t="1725971270943" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="44144" width="22" height="22"><path d="M512 960A448.11 448.11 0 0 1 337.61 99.22a448.11 448.11 0 0 1 348.78 825.56A445.19 445.19 0 0 1 512 960z m0-832c-211.74 0-384 172.26-384 384s172.26 384 384 384 384-172.26 384-384-172.26-384-384-384z" fill="#AFD979" p-id="44145"></path><path d="M446.06 720.79A64.16 64.16 0 0 1 400.79 702L265.37 566.63a32 32 0 0 1 45.26-45.26L446 656.79l249.62-293.52a32 32 0 0 1 48.76 41.46L494.84 698.19a64.1 64.1 0 0 1-46.14 22.54q-1.32 0.06-2.64 0.06z" fill="#AFD979" p-id="44146"></path></svg>
+                        {% elif case.status == 1 %}
+                            <svg t="1725971304606" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="44767" width="22" height="22"><path d="M512 960A448.11 448.11 0 0 1 337.61 99.22a448.11 448.11 0 0 1 348.78 825.56A445.19 445.19 0 0 1 512 960z m0-832c-211.74 0-384 172.26-384 384s172.26 384 384 384 384-172.26 384-384-172.26-384-384-384z" fill="#E3A032" p-id="44768"></path><path d="M512 608a32 32 0 0 1-32-32V288a32 32 0 0 1 64 0v288a32 32 0 0 1-32 32z" fill="#E3A032" p-id="44769"></path><path d="M464 672m48 0l0 0q48 0 48 48l0 0q0 48-48 48l0 0q-48 0-48-48l0 0q0-48 48-48Z" fill="#E3A032" p-id="44770"></path></svg>
+                        {% elif case.status == 2 %}
+                            <svg t="1725971315140" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="44975" width="22" height="22"><path d="M512 960A448.11 448.11 0 0 1 337.61 99.22a448.11 448.11 0 0 1 348.78 825.56A445.19 445.19 0 0 1 512 960z m0-832c-211.74 0-384 172.26-384 384s172.26 384 384 384 384-172.26 384-384-172.26-384-384-384z" fill="#CE606B" p-id="44976"></path><path d="M352 704a32 32 0 0 1-22.63-54.63l320-320a32 32 0 0 1 45.26 45.26l-320 320A31.9 31.9 0 0 1 352 704z" fill="#CE606B" p-id="44977"></path><path d="M672 704a31.9 31.9 0 0 1-22.63-9.37l-320-320a32 32 0 0 1 45.26-45.26l320 320A32 32 0 0 1 672 704z" fill="#CE606B" p-id="44978"></path></svg>
+                        {% elif case.status == 3 %}
+                            <svg t="1725971351500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="46009" width="22" height="22"><path d="M352 480h320c9.344 0 17.024 3.008 23.04 8.96 5.952 6.016 8.96 13.696 8.96 23.04a31.168 31.168 0 0 1-8.96 23.04 31.168 31.168 0 0 1-23.04 8.96h-320a31.168 31.168 0 0 1-23.04-8.96A31.168 31.168 0 0 1 320 512c0-9.344 3.008-17.024 8.96-23.04a31.168 31.168 0 0 1 23.04-8.96zM512 896c108.672-2.688 199.168-40.192 271.488-112.512S893.312 620.672 896 512c-2.688-108.672-40.192-199.168-112.512-271.488S620.672 130.688 512 128c-108.672 2.688-199.168 40.192-271.488 112.512S130.688 403.328 128 512c2.688 108.672 40.192 199.168 112.512 271.488S403.328 893.312 512 896z m0 64c-126.72-3.328-232.192-47.168-316.544-131.52C111.232 744.192 67.392 638.72 64 512c3.328-126.72 47.168-232.192 131.456-316.544C279.872 111.232 385.344 67.392 512 64c126.72 3.328 232.192 47.168 316.48 131.456C912.832 279.872 956.672 385.344 960 512c-3.328 126.72-47.168 232.192-131.52 316.48C744.192 912.832 638.72 956.672 512 960z" p-id="46010" fill="#8A8A8A"></path></svg>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            <tr class="table-cell-details" id="details-{{case.id}}"  style="display: none;">
+                <td colspan="3">
+                    <div class="details-container">
+                        <div class="details-multimedia">
+                        <!-- 左上视频模块 -->
+                        <div class="multimedia-module">
+                            {% if case.video_path %}
+                                <video width="100%" controls>
+                                    <source src={{case.video_path}} type="video/mp4">
+                                </video>
+                            {% endif %}
+                        </div>
+                        <!-- 右上图片模块 -->
+                        <div class="multimedia-module">
+                            {% if case.screenshot_path %}
+                                <img src={{case.screenshot_path}} alt="描述性文字" width="100%">
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- 下方文本内容 -->
+                        <div class="text-content">
+                            {% if case.request and case.is_api %}
+                                {% for req in case.request %}
+                                <div class="api-block">
+                                    <p class="api-title">{{ req.method }} {{ req.url | e }}</p>
+                                    {% if req.params %}
+                                        <p class="api-label">Query Params:</p>
+                                        <pre>{{ req.params | e }}</pre>
+                                    {% endif %}
+                                    {% if req.body %}
+                                        <p class="api-label">Request Body:</p>
+                                        <pre>{{ req.body | e }}</pre>
+                                    {% endif %}
+                                    <p class="api-label">Response:
+                                        <span class="api-status {% if req.status_code == 200 %}api-status-ok{% else %}api-status-err{% endif %}">
+                                            {{ req.status_code }}
+                                        </span>
+                                    </p>
+                                    <pre>{{ req.response | e }}</pre>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                            {% if case.message %}
+                                {% if case.status == 3 %}
+                                    <p>跳过信息:</p>
+                                {% else %}
+                                    <p>错误信息:</p>
+                                {% endif %}
+                                <pre class="result_css_errorp">{{ case.message | e }}</pre>
+                            {% endif %}
+                        <!-- 更多文本内容 -->
+                        </div>
+                    </div>
+                </td> 
+            </tr>
+        {% endfor %}
+    {% endfor %}
+</table>
+
+<script>
+function toggleDetails(element) {
+
+    var id = element.id
+   var detailsDiv = document.getElementById('details-' + id)
+   var detailsBtn = document.getElementById('btn-' + id)
+
+   if (detailsDiv.style.display === 'none') {
+     detailsDiv.style.display = 'block';
+     detailsBtn.textContent = '-';
+   } else {
+     detailsDiv.style.display = 'none';
+     detailsBtn.textContent = '+';
+   }
+}
+</script>
+
+</body>
+</html>
